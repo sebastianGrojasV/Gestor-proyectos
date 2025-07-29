@@ -1,0 +1,98 @@
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    padding: 2rem;
+  }
+
+  h1 {
+    color: #333;
+  }
+
+  form {
+    margin-bottom: 1.5rem;
+  }
+
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #28a745;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 0.5rem;
+  }
+
+  button:hover {
+    background: #218838;
+  }
+
+  .task {
+    background: white;
+    padding: 1rem;
+    border-left: 5px solid #007bff;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .task.completed {
+    border-left-color: #28a745;
+    opacity: 0.8;
+  }
+
+  .task p {
+    margin: 0.5rem 0;
+  }
+
+  .actions {
+    margin-top: 0.5rem;
+  }
+
+  .actions form {
+    display: inline;
+  }
+</style>
+
+<a href="/" class="btn btn-secondary mb-3">← Volver a proyectos</a>
+
+<h2><%= project.name %></h2>
+
+<form action="/project/<%= project._id %>/task" method="POST">
+  <input type="text" name="name" placeholder="Nombre de la tarea" required>
+  <textarea name="description" placeholder="Descripción adicional (opcional)"></textarea>
+  <button type="submit">Agregar tarea</button>
+</form>
+
+<% tasks.forEach(task => { %>
+  <div class="task <%= task.status === 'completada' ? 'completed' : '' %>">
+    <strong><%= task.name %></strong>
+    <% if (task.description) { %>
+      <p><em><%= task.description %></em></p>
+    <% } %>
+    <span>Estado: <%= task.status %></span>
+    <div class="actions">
+      <form action="/task/<%= task._id %>/toggle" method="POST">
+        <button type="submit">
+          Marcar como <%= task.status === 'pendiente' ? 'completada' : 'pendiente' %>
+        </button>
+      </form>
+      <form action="/task/<%= task._id %>/delete" method="POST">
+        <button style="background:#dc3545;">Eliminar</button>
+      </form>
+    </div>
+  </div>
+<% }) %>
+
+
+

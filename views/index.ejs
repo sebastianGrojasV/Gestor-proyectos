@@ -1,0 +1,25 @@
+<%- include('partials/header') %>
+
+<div class="card shadow-sm p-4 mb-4">
+  <form action="/add-project" method="POST" class="d-flex gap-2">
+    <input name="name" class="form-control" placeholder="Nombre del proyecto" required>
+    <button class="btn btn-primary" type="submit">Agregar proyecto</button>
+  </form>
+</div>
+
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+  <% projects.forEach(p => { %>
+    <div class="col">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title"><a href="/project/<%= p._id %>"><%= p.name %></a></h5>
+        </div>
+        <div class="card-footer text-end">
+          <form action="/project/<%= p._id %>/delete" method="POST" onsubmit="return confirm('¿Eliminar este proyecto?')">
+            <button class="btn btn-sm btn-danger">Eliminar</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  <% }) %>
+</div>

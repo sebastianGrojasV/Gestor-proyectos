@@ -1,0 +1,16 @@
+body {
+  font-family: "Segoe UI", sans-serif;
+}
+
+a {
+  text-decoration: none;
+}
+
+.card-title a {
+  color: #333;
+}
+
+.card-title a:hover {
+  text-decoration: underline;
+}
+
