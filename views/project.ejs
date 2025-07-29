@@ -1,98 +1,223 @@
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
-    padding: 2rem;
+  body { /* Estilo para el cuerpo de la pagina */
+    font-family: Arial, sans-serif; /* Define la fuente */
+    background: #f4f4f4; /* Color de fondo */
+    padding: 2rem; /* Agrega padding al cuerpo */
   }
 
-  h1 {
-    color: #333;
+  h1, h2 { /* Estilo para los encabezados */
+    color: #333; /* Color de los encabezados */
   }
 
-  form {
-    margin-bottom: 1.5rem;
+  form { /* Estilo para los formularios */
+    margin-bottom: 1.5rem; /* Margen inferior */
   }
 
-  input[type="text"], textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+  input[type="text"], textarea { /* Estilo para los campos de texto e input */
+    width: 100%; /* Ancho completo */
+    padding: 10px; /* Espaciado interno */
+    margin-top: 0.5rem; /* Margen superior */
+    margin-bottom: 1rem; /* Margen inferior */
+    border: 1px solid #ccc; /* Borde gris */
+    border-radius: 4px; /* Bordes redondeados */
+    box-sizing: border-box; /* Incluye padding en el cálculo de ancho */
   }
 
-  button {
-    padding: 0.5rem 1rem;
-    border: none;
-    background: #28a745;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 0.5rem;
+  button, .btn-link { /* Estilo para los botones */
+    padding: 0.5rem 1rem; /* Espaciado interno */
+    border: none; /* Sin borde */
+    background: #28a745; /* Color de fondo */
+    color: white; /* Color del texto */
+    border-radius: 4px; /* Bordes redondeados */
+    cursor: pointer; /* Puntero al pasar el mouse */
+    margin-right: 0.5rem; /* Margen derecho */
+    text-decoration: none; /* Quita subrayado */
+    display: inline-block; /* Display en línea */
   }
 
-  button:hover {
-    background: #218838;
+  button:hover, .btn-link:hover { /* Estilo cuando el boton es hovered */
+    background: #218838; /* Color de fondo al pasar el mouse */
   }
 
-  .task {
-    background: white;
-    padding: 1rem;
-    border-left: 5px solid #007bff;
-    margin-bottom: 1rem;
-    border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  .btn-edit { /* Estilo para el boton de editar */
+    background: #ffc107; /* Color de fondo */
+    color: #333; /* Color del texto */
   }
 
-  .task.completed {
-    border-left-color: #28a745;
-    opacity: 0.8;
+  .btn-edit:hover { /* Estilo cuando el boton de editar es hovered */
+    background: #e0a800; /* Color de fondo al pasar el mouse */
   }
 
-  .task p {
-    margin: 0.5rem 0;
+  .btn-danger { /* Estilo para el boton de eliminar */
+    background: #dc3545; /* Color de fondo */
   }
 
-  .actions {
-    margin-top: 0.5rem;
+  .btn-danger:hover { /* Estilo cuando el boton de eliminar es hovered */
+    background: #c82333; /* Color de fondo al pasar el mouse */
   }
 
-  .actions form {
-    display: inline;
+  .btn-secondary { /* Estilo para el boton secundario */
+    background: #6c757d; /* Color de fondo */
   }
+
+  .btn-secondary:hover { /* Estilo cuando el boton secundario es hovered */
+    background: #5a6268; /* Color de fondo al pasar el mouse */
+  }
+
+  .task { /* Estilo para las tareas */
+    background: white; /* Color de fondo */
+    padding: 1rem; /* Espaciado interno */
+    border-left: 5px solid #007bff; /* Borde izquierdo azul */
+    margin-bottom: 1rem; /* Margen inferior */
+    border-radius: 4px; /* Bordes redondeados */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Sombra ligera */
+  }
+
+  .task.completed { /* Estilo para tareas completadas */
+    border-left-color: #28a745; /* Cambio de color de borde */
+    opacity: 0.8; /* Reduce la opacidad */
+  }
+
+  .task p { /* Estilo para los párrafos dentro de la tarea */
+    margin: 0.5rem 0; /* Margen superior e inferior */
+  }
+
+  .actions { /* Estilo para las acciones dentro de la tarea */
+    margin-top: 0.5rem; /* Margen superior */
+  }
+
+  .actions form, .actions a { /* Estilo para formularios y enlaces dentro de las acciones */
+    display: inline; /* Muestra en línea */
+  }
+
+  /* Modo oscuro */
+  .dark-mode { /* Estilo para el modo oscuro */
+    background-color: #121212; /* Color de fondo oscuro */
+    color: #f1f1f1; /* Color del texto en blanco */
+  }
+
+  .dark-mode input,
+  .dark-mode textarea { /* Estilo para los inputs y textarea en modo oscuro */
+    background-color: #1e1e1e; /* Fondo oscuro */
+    color: white; /* Texto blanco */
+    border: 1px solid #666; /* Borde gris */
+  }
+
+  .dark-mode .task { /* Estilo para las tareas en modo oscuro */
+    background-color: #1e1e1e; /* Fondo oscuro */
+    border-left-color: #00bcd4; /* Borde izquierdo azul */
+  }
+
+  .dark-mode .task.completed { /* Estilo para las tareas completadas en modo oscuro */
+    border-left-color: #4caf50; /* Borde verde */
+  }
+
+  .dark-mode .btn-link,
+  .dark-mode button { /* Estilo para botones y enlaces en modo oscuro */
+    background-color: #333; /* Fondo oscuro */
+    color: #f1f1f1; /* Texto blanco */
+  }
+
+  .dark-mode .btn-link:hover,
+  .dark-mode button:hover { /* Estilo cuando los botones son hovered en modo oscuro */
+    background-color: #555; /* Fondo gris más claro */
+  }
+
+  /* Colores específicos en modo oscuro */
+  .dark-mode .btn-danger { /* Estilo para el boton de eliminar en modo oscuro */
+    background-color: #ff4d4d; /* Fondo rojo */
+    color: white; /* Texto blanco */
+  }
+
+  .dark-mode .btn-danger:hover { /* Estilo cuando el boton de eliminar es hovered en modo oscuro */
+    background-color: #cc0000; /* Fondo rojo más oscuro */
+  }
+
+  .dark-mode .btn-edit { /* Estilo para el boton de editar en modo oscuro */
+    background-color: #ffd54f; /* Fondo amarillo */
+    color: #333; /* Texto oscuro */
+  }
+
+  .dark-mode .btn-edit:hover { /* Estilo cuando el boton de editar es hovered en modo oscuro */
+    background-color: #ffca28; /* Fondo amarillo más claro */
+  }
+
+  .dark-mode button[type="submit"] { /* Estilo para el boton de enviar en modo oscuro */
+    background-color: #4caf50; /* Fondo verde */
+    color: white; /* Texto blanco */
+  }
+
+  .dark-mode button[type="submit"]:hover { /* Estilo cuando el boton de enviar es hovered en modo oscuro */
+    background-color: #388e3c; /* Fondo verde más oscuro */
+  }
+
 </style>
 
-<a href="/" class="btn btn-secondary mb-3">← Volver a proyectos</a>
+<a href="/" class="btn-link btn-secondary mb-3">← Volver a proyectos</a> <!-- Enlace para volver a la lista de proyectos -->
+<button id="toggleTheme" class="btn-link btn-secondary mb-3"> <!-- Boton para cambiar tema -->
+  <span id="themeIcon">🌙</span> Cambiar tema <!-- Icono y texto para cambiar el tema -->
+</button>
 
-<h2><%= project.name %></h2>
+<h2><%= project.name %></h2> <!-- Muestra el nombre del proyecto -->
 
-<form action="/project/<%= project._id %>/task" method="POST">
-  <input type="text" name="name" placeholder="Nombre de la tarea" required>
-  <textarea name="description" placeholder="Descripción adicional (opcional)"></textarea>
-  <button type="submit">Agregar tarea</button>
+<form action="/project/<%= project._id %>/task" method="POST"> <!-- Formulario para agregar una tarea -->
+  <input type="text" name="name" placeholder="Nombre de la tarea" required> <!-- Campo para el nombre de la tarea -->
+  <textarea name="description" placeholder="Descripción adicional (opcional)"></textarea> <!-- Campo para la descripción de la tarea -->
+  <button type="submit">Agregar tarea</button> <!-- Boton para agregar la tarea -->
 </form>
 
-<% tasks.forEach(task => { %>
-  <div class="task <%= task.status === 'completada' ? 'completed' : '' %>">
-    <strong><%= task.name %></strong>
-    <% if (task.description) { %>
-      <p><em><%= task.description %></em></p>
+<% tasks.forEach(task => { %> <!-- Itera sobre las tareas del proyecto -->
+  <div class="task <%= task.status === 'completada' ? 'completed' : '' %>"> <!-- Muestra la tarea y su estado -->
+    <strong><%= task.name %></strong> <!-- Nombre de la tarea -->
+    <% if (task.description) { %> <!-- Si hay descripción, la muestra -->
+      <p><em><%= task.description %></em></p> <!-- Descripción de la tarea -->
     <% } %>
-    <span>Estado: <%= task.status %></span>
-    <div class="actions">
-      <form action="/task/<%= task._id %>/toggle" method="POST">
+    <span>Estado: <%= task.status %></span> <!-- Muestra el estado de la tarea -->
+    <div class="actions"> <!-- Acciones disponibles para la tarea -->
+      <form action="/task/<%= task._id %>/toggle" method="POST"> <!-- Formulario para cambiar el estado de la tarea -->
         <button type="submit">
-          Marcar como <%= task.status === 'pendiente' ? 'completada' : 'pendiente' %>
+          Marcar como <%= task.status === 'pendiente' ? 'completada' : 'pendiente' %> <!-- Texto del boton dependiendo del estado -->
         </button>
       </form>
-      <form action="/task/<%= task._id %>/delete" method="POST">
-        <button style="background:#dc3545;">Eliminar</button>
+
+      <form action="/task/<%= task._id %>/edit" method="GET" style="display:inline;"> <!-- Formulario para editar la tarea -->
+        <button type="submit" class="btn-edit">Modificar</button> <!-- Boton para editar -->
+        </form>
+
+      <form action="/task/<%= task._id %>/delete" method="POST"> <!-- Formulario para eliminar la tarea -->
+        <button class="btn-danger">Eliminar</button> <!-- Boton para eliminar -->
       </form>
     </div>
   </div>
-<% }) %>
+<% }) %> <!-- Fin de la iteracion sobre tareas -->
+
+<script>
+  const toggleButton = document.getElementById('toggleTheme'); //Obtiene el boton para cambiar tema
+  const themeIcon = document.getElementById('themeIcon'); //Obtiene el icono de tema
+  const body = document.body; //Obtiene el cuerpo del documento
+
+  // Funcion para actualizar el icono
+  function actualizarIcono() {
+    themeIcon.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙'; // Cambia el icono entre sol y luna
+  }
+
+  // Cargar estado guardado
+  if (localStorage.getItem('theme') === 'dark') {
+    body.classList.add('dark-mode'); // Aplica el modo oscuro si esta guardado
+  }
+
+  actualizarIcono(); // Actualiza el icono al cargar la pagina
+
+  toggleButton.addEventListener('click', () => { // Agrega un evento de clic al boton de tema
+    body.classList.toggle('dark-mode'); // Activa o desactiva el modo oscuro
+    const theme = body.classList.contains('dark-mode') ? 'dark' : 'light'; // Determina el tema actual
+    localStorage.setItem('theme', theme); // Guarda el tema en localStorage
+    actualizarIcono(); // Actualiza el icono despues de cambiar el tema
+  });
+</script>
+
+
+
 
 
 

@@ -1,25 +1,138 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"> <!-- Define la codificacion de caracteres -->
+  <title>Gestor de Proyectos</title> <!-- Titulo de la pagina -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Enlace a Bootstrap para el estilo -->
+  <style>
+    body { /* Estilo para el cuerpo de la pagina */
+      font-family: Arial, sans-serif; /* Define la fuente */
+      padding: 2rem; /* Agrega padding al cuerpo */
+      background-color: #f4f4f4; /* Color de fondo */
+    }
 
-<div class="card shadow-sm p-4 mb-4">
-  <form action="/add-project" method="POST" class="d-flex gap-2">
-    <input name="name" class="form-control" placeholder="Nombre del proyecto" required>
-    <button class="btn btn-primary" type="submit">Agregar proyecto</button>
-  </form>
-</div>
+    .btn-link { /* Estilo del boton de enlace */
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      background-color: #6c757d;
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin-bottom: 1rem;
+    }
 
-<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-  <% projects.forEach(p => { %>
-    <div class="col">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title"><a href="/project/<%= p._id %>"><%= p.name %></a></h5>
-        </div>
-        <div class="card-footer text-end">
-          <form action="/project/<%= p._id %>/delete" method="POST" onsubmit="return confirm('¿Eliminar este proyecto?')">
-            <button class="btn btn-sm btn-danger">Eliminar</button>
-          </form>
-        </div>
-      </div>
+    .btn-link:hover { /* Estilo cuando el boton es hovered */
+      background-color: #5a6268;
+    }
+
+    /* Modo oscuro */
+    .dark-mode { /* Estilos para el modo oscuro */
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+
+    .dark-mode .card { /* Estilo para las tarjetas en modo oscuro */
+      background-color: #1e1e1e;
+      color: #f1f1f1;
+    }
+
+    .dark-mode input, .dark-mode .form-control { /* Estilos para los inputs en modo oscuro */
+      background-color: #2a2a2a;
+      color: white;
+      border: 1px solid #666;
+    }
+
+    .dark-mode .btn-primary { /* Estilo para el boton primario en modo oscuro */
+      background-color: #4caf50;
+      border: none;
+    }
+
+    .dark-mode .btn-warning { /* Estilo para el boton de advertencia en modo oscuro */
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .dark-mode .btn-danger { /* Estilo para el boton de peligro en modo oscuro */
+      background-color: #dc3545;
+    }
+
+    .dark-mode .btn-link { /* Estilo para el boton de enlace en modo oscuro */
+      background-color: #333;
+      color: white;
+    }
+
+    .dark-mode .btn-link:hover { /* Estilo del boton de enlace cuando es hovered en modo oscuro */
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h1 class="text-center mb-4">📝 Gestor de Proyectos</h1> <!-- Titulo de la pagina -->
+
+    <!-- Boton para cambiar tema -->
+    <div class="text-end mb-3">
+      <button id="toggleTheme" class="btn-link">
+        <span id="themeIcon">🌙</span> Cambiar tema <!-- Cambia el tema al hacer clic -->
+      </button>
     </div>
-  <% }) %>
-</div>
+
+    <div class="card shadow-sm p-4 mb-4"> <!-- Tarjeta para agregar un nuevo proyecto -->
+      <form action="/add-project" method="POST" class="d-flex gap-2">
+        <input name="name" class="form-control" placeholder="Nombre del proyecto" required> <!-- Campo para ingresar el nombre del proyecto -->
+        <button class="btn btn-primary" type="submit">Agregar proyecto</button> <!-- Boton para agregar el proyecto -->
+      </form>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> <!-- Fila para mostrar los proyectos -->
+      <% projects.forEach(p => { %> <!-- Itera sobre cada proyecto -->
+        <div class="col"> <!-- Columna para cada proyecto -->
+          <div class="card h-100 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">
+                <a href="/project/<%= p._id %>"><%= p.name %></a> <!-- Enlace al proyecto -->
+              </h5>
+              <div class="mt-2">
+                <a href="/project/<%= p._id %>/edit" class="btn btn-sm btn-warning">✏️ Editar</a> <!-- Boton para editar el proyecto -->
+              </div>
+            </div>
+            <div class="card-footer text-end">
+              <form action="/project/<%= p._id %>/delete" method="POST" onsubmit="return confirm('¿Eliminar este proyecto?')"> <!-- Formulario para eliminar el proyecto -->
+                <button class="btn btn-sm btn-danger">🗑️ Eliminar</button> <!-- Boton para eliminar el proyecto -->
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %> <!-- Fin de la iteracion sobre proyectos -->
+    </div>
+
+  </div>
+
+  <script>
+    const toggleButton = document.getElementById('toggleTheme'); //Obtiene el boton para cambiar tema
+    const themeIcon = document.getElementById('themeIcon'); //Obtiene el icono de tema
+    const body = document.body; //Obtiene el cuerpo del documento
+
+    function actualizarIcono() { //Funcion para actualizar el icono dependiendo del tema
+      themeIcon.textContent = body.classList.contains('dark-mode') ? '☀️' : '🌙'; //Cambia el icono entre sol y luna
+    }
+
+    if (localStorage.getItem('theme') === 'dark') { //Revisa si el tema guardado es oscuro
+      body.classList.add('dark-mode'); //Aplica el modo oscuro
+    }
+
+    actualizarIcono(); //Actualiza el icono al cargar la pagina
+
+    toggleButton.addEventListener('click', () => { //Agrega un evento de clic al boton de tema
+      body.classList.toggle('dark-mode'); //Activa o desactiva el modo oscuro
+      const theme = body.classList.contains('dark-mode') ? 'dark' : 'light'; //Determina el tema actual
+      localStorage.setItem('theme', theme); //Guarda el tema en localStorage
+      actualizarIcono(); //Actualiza el icono despues de cambiar el tema
+    });
+  </script>
+</body>
+</html>
+
