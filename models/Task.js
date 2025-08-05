@@ -1,13 +1,25 @@
-const mongoose = require('mongoose'); //importa mongoose para interactuar con la base de datos
-const Schema = mongoose.Schema; //asigna el objeto Schema de mongoose a una variable
+const mongoose = require('mongoose');
 
-const taskSchema = new Schema({ //define el esquema de tarea
-  name: String, //nombre de la tarea
-  description: String, //descripción de la tarea
-  status: { type: String, default: 'pendiente' }, //estado de la tarea, por defecto es 'pendiente'
-  projectId: { type: Schema.Types.ObjectId, ref: 'Project' } //referencia al proyecto asociado
+const taskSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  status: {
+    type: String,
+    default: 'pendiente'
+  },
+  limitDate: Date,
+  projectId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Project'
+  },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 });
 
-module.exports = mongoose.model('Task', taskSchema); //exporta el modelo de tarea basado en el esquema
+module.exports = mongoose.model('Task', taskSchema);
+
 
 

@@ -1,96 +1,164 @@
-const express = require('express'); // Importa Express
-const router = express.Router(); // Crea una nueva instancia del router de Express
-const Project = require('../models/Project'); // Importa el modelo Project
-const Task = require('../models/Task'); // Importa el modelo Task
+const express = require('express');
+const router = express.Router();
+const Project = require('../models/Project');
+const Task = require('../models/Task');
+const requireLogin = require('../middleware/requireLogin'); // Asegura que el usuario esté logueado
 
-// Ruta para mostrar todos los proyectos
-router.get('/', async (req, res) => {
-  const projects = await Project.find(); // Obtiene todos los proyectos
-  res.render('index', { projects }); // Renderiza la vista 'index' con los proyectos
+// Mostrar todos los proyectos del usuario
+router.get('/', requireLogin, async (req, res) => {
+  const projects = await Project.find({ userId: req.session.userId });
+  res.render('index', { projects });
 });
 
-// Ruta para agregar un nuevo proyecto
-router.post('/add-project', async (req, res) => {
-  await Project.create({ name: req.body.name }); // Crea un nuevo proyecto con el nombre proporcionado
-  res.redirect('/'); // Redirige a la página principal
+// Crear nuevo proyecto
+router.post('/add-project', requireLogin, async (req, res) => {
+  await Project.create({
+    name: req.body.name,
+    userId: req.session.userId
+  });
+  res.redirect('/');
 });
 
-// Ruta para ver los detalles de un proyecto y sus tareas
-router.get('/project/:id', async (req, res) => {
-  const estado = req.query.estado; // Obtiene el estado de la consulta
-  const project = await Project.findById(req.params.id); // Busca el proyecto por ID
+// Ver un proyecto y sus tareas
+router.get('/project/:id', requireLogin, async (req, res) => {
+  const estado = req.query.estado;
+  const project = await Project.findOne({
+    _id: req.params.id,
+    userId: req.session.userId
+  });
 
-  let filtro = { projectId: project._id }; // Filtro para obtener las tareas del proyecto
-  if (estado === 'pendiente' || estado === 'completada') { // Si el estado es pendiente o completada, filtra las tareas
+  if (!project) return res.redirect('/');
+
+  let filtro = { projectId: project._id, userId: req.session.userId };
+  if (estado === 'pendiente' || estado === 'completada') {
     filtro.status = estado;
   }
 
-  const tasks = await Task.find(filtro); // Obtiene las tareas según el filtro
-  res.render('project', { project, tasks, estado }); // Renderiza la vista del proyecto con las tareas filtradas
+  const todasLasTareas = await Task.find(filtro);
+
+  const hoy = new Date();
+  const urgentes = [];
+  const vencidas = [];
+  const proximas = [];
+  const completadas = [];
+
+  todasLasTareas.forEach(task => {
+    if (task.status === 'completada') {
+      completadas.push(task);
+    } else if (task.limitDate) {
+      const fecha = new Date(task.limitDate);
+      const diasRestantes = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+      if (fecha < hoy) vencidas.push(task);
+      else if (diasRestantes <= 7) urgentes.push(task);
+      else proximas.push(task);
+    } else {
+      proximas.push(task);
+    }
+  });
+
+  res.render('project', {
+    project,
+    urgentes,
+    vencidas,
+    proximas,
+    completadas,
+    estado
+  });
 });
 
-// Ruta para agregar una nueva tarea a un proyecto
-router.post('/project/:id/add-task', async (req, res) => {
-  await Task.create({ projectId: req.params.id, description: req.body.description }); // Crea una nueva tarea para el proyecto
-  res.redirect(`/project/${req.params.id}`); // Redirige a la vista del proyecto
+// Agregar tarea
+router.post('/project/:id/task', requireLogin, async (req, res) => {
+  const { name, description, limitDate } = req.body;
+
+  const project = await Project.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!project) return res.redirect('/');
+
+  const task = new Task({
+    name,
+    description,
+    limitDate: limitDate ? new Date(limitDate) : null,
+    projectId: project._id,
+    userId: req.session.userId
+  });
+
+  await task.save();
+  res.redirect(`/project/${project._id}`);
 });
 
-// Ruta para alternar el estado de una tarea (pendiente/completada)
-router.post('/task/:id/toggle', async (req, res) => {
-  const task = await Task.findById(req.params.id); // Busca la tarea por ID
-  task.status = task.status === 'pendiente' ? 'completada' : 'pendiente'; // Alterna el estado de la tarea
-  await task.save(); // Guarda los cambios en la tarea
-  res.redirect(`/project/${task.projectId}`); // Redirige a la vista del proyecto correspondiente
+// Cambiar estado de la tarea
+router.post('/task/:id/toggle', requireLogin, async (req, res) => {
+  const task = await Task.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!task) return res.redirect('/');
+
+  task.status = task.status === 'pendiente' ? 'completada' : 'pendiente';
+  await task.save();
+
+  res.redirect(`/project/${task.projectId}`);
 });
 
-// Ruta para eliminar una tarea
-router.post('/task/:id/delete', async (req, res) => {
-  const task = await Task.findById(req.params.id); // Busca la tarea por ID
-  const projectId = task.projectId; // Obtiene el ID del proyecto relacionado
-  await Task.findByIdAndDelete(req.params.id); // Elimina la tarea por ID
-  res.redirect(`/project/${projectId}`); // Redirige a la vista del proyecto correspondiente
+// Eliminar tarea
+router.post('/task/:id/delete', requireLogin, async (req, res) => {
+  const task = await Task.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!task) return res.redirect('/');
+
+  await Task.deleteOne({ _id: req.params.id });
+  res.redirect(`/project/${task.projectId}`);
 });
 
-// Ruta duplicada para eliminar una tarea (eliminar esta ruta)
-router.post('/task/:id/delete', async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id); // Elimina la tarea por ID
-  res.redirect('back'); // Redirige a la página anterior
+// Mostrar formulario de edición de proyecto
+router.get('/project/:id/edit', requireLogin, async (req, res) => {
+  const project = await Project.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!project) return res.redirect('/');
+  res.render('editProject', { project });
 });
 
-// Ruta para agregar una tarea directamente a un proyecto
-router.post('/project/:id/task', async (req, res) => {
-  const { name, description } = req.body; // Obtiene el nombre y la descripción de la tarea
-  const task = new Task({ name, description, projectId: req.params.id }); // Crea una nueva tarea
-  await task.save(); // Guarda la tarea en la base de datos
-  res.redirect(`/project/${req.params.id}`); // Redirige a la vista del proyecto
+// Actualizar proyecto
+router.post('/project/:id/update', requireLogin, async (req, res) => {
+  await Project.findOneAndUpdate(
+    { _id: req.params.id, userId: req.session.userId },
+    { name: req.body.name }
+  );
+  res.redirect('/');
 });
 
-// Ruta para mostrar el formulario de edición de un proyecto
-router.get('/project/:id/edit', async (req, res) => {
-  const project = await Project.findById(req.params.id); // Busca el proyecto por ID
-  res.render('editProject', { project }); // Renderiza la vista de edición del proyecto
+// Editar tarea (formulario)
+router.get('/task/:id/edit', requireLogin, async (req, res) => {
+  const task = await Task.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!task) return res.redirect('/');
+
+  const project = await Project.findOne({ _id: task.projectId, userId: req.session.userId });
+  if (!project) return res.redirect('/');
+
+  res.render('editTask', { task, project });
 });
 
-// Ruta para procesar la edición de un proyecto
-router.post('/project/:id/update', async (req, res) => {
-  await Project.findByIdAndUpdate(req.params.id, { name: req.body.name }); // Actualiza el nombre del proyecto
-  res.redirect('/'); // Redirige a la página principal
+// Actualizar tarea
+router.post('/task/:id/update', requireLogin, async (req, res) => {
+  const { name, description, limitDate } = req.body;
+
+  const task = await Task.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!task) return res.redirect('/');
+
+  await Task.findByIdAndUpdate(req.params.id, {
+    name,
+    description,
+    limitDate: limitDate ? new Date(limitDate) : null
+  });
+
+  res.redirect(`/project/${task.projectId}`);
 });
 
-// Ruta para mostrar el formulario de edición de una tarea
-router.get('/task/:id/edit', async (req, res) => {
-  const task = await Task.findById(req.params.id); // Busca la tarea por ID
-  const project = await Project.findById(task.projectId); // Busca el proyecto relacionado
-  res.render('editTask', { task, project }); // Renderiza la vista de edición de la tarea
+// Eliminar proyecto y sus tareas
+router.post('/project/:id/delete', requireLogin, async (req, res) => {
+  const project = await Project.findOne({ _id: req.params.id, userId: req.session.userId });
+  if (!project) return res.redirect('/');
+
+  await Task.deleteMany({ projectId: project._id, userId: req.session.userId });
+  await Project.deleteOne({ _id: project._id });
+
+  res.redirect('/');
 });
 
-// Ruta para procesar la edición de una tarea
-router.post('/task/:id/update', async (req, res) => {
-  const { name, description } = req.body; // Obtiene el nombre y la descripción de la tarea
-  const task = await Task.findById(req.params.id); // Busca la tarea por ID
-  await Task.findByIdAndUpdate(req.params.id, { name, description }); // Actualiza la tarea
-  res.redirect(`/project/${task.projectId}`); // Redirige a la vista del proyecto correspondiente
-});
+module.exports = router;
 
-module.exports = router; // Exporta el router
 

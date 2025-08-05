@@ -1,0 +1,36 @@
+<strong><%= task.name %></strong>
+<% if (task.description) { %>
+  <p><em><%= task.description %></em></p>
+<% } %>
+
+<% if (task.fechaLimite) { 
+  const fechaLimite = new Date(task.fechaLimite);
+  const hoy = new Date();
+  const diasRestantes = Math.ceil((fechaLimite - hoy) / (1000 * 60 * 60 * 24));
+%>
+  <p>
+    <strong>Fecha límite:</strong> 
+    <%= fechaLimite.toLocaleDateString('es-ES') %> 
+    <% if (fechaLimite < hoy) { %>
+      <span style="color: red; font-weight: bold;">(¡Vencida!)</span>
+    <% } else if (diasRestantes <= 7 && task.status === 'pendiente') { %>
+      <span style="color: orange; font-weight: bold;">🚨 Queda <%= diasRestantes %> día<%= diasRestantes === 1 ? '' : 's' %></span>
+    <% } %>
+  </p>
+<% } %>
+
+<div class="actions">
+  <form action="/task/<%= task._id %>/toggle" method="POST">
+    <button type="submit">
+      Marcar como <%= task.status === 'pendiente' ? 'completada' : 'pendiente' %>
+    </button>
+  </form>
+
+  <form action="/task/<%= task._id %>/edit" method="GET" style="display:inline;">
+    <button type="submit" class="btn-edit">✏️ Modificar</button>
+  </form>
+
+  <form action="/task/<%= task._id %>/delete" method="POST">
+    <button class="btn-danger">Eliminar</button>
+  </form>
+</div>

@@ -4,66 +4,8 @@
   <meta charset="UTF-8"> <!-- Define la codificacion de caracteres -->
   <title>Editar Tarea</title> <!-- Titulo de la pagina -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Enlace a Bootstrap para el estilo -->
-  <style>
-    body { /* Estilo para el cuerpo de la pagina */
-      font-family: Arial, sans-serif; /* Define la fuente */
-      padding: 2rem; /* Agrega padding al cuerpo */
-      background-color: #f4f4f4; /* Color de fondo */
-    }
-
-    .btn-link { /* Estilo para el boton de enlace */
-      padding: 0.5rem 1rem; /* Espaciado interno */
-      border: none; /* Sin borde */
-      border-radius: 4px; /* Bordes redondeados */
-      background-color: #6c757d; /* Color de fondo */
-      color: white; /* Color del texto */
-      font-size: 1rem; /* Tamaño de la fuente */
-      cursor: pointer; /* Cambia el puntero al pasar el mouse */
-      text-decoration: none; /* Quita subrayado */
-      display: inline-block; /* Display en línea */
-      margin-bottom: 1rem; /* Margen inferior */
-    }
-
-    .btn-link:hover { /* Estilo cuando el boton de enlace es hovered */
-      background-color: #5a6268; /* Color de fondo al pasar el mouse */
-    }
-
-    .form-control { /* Estilo para los campos de formulario */
-      margin-bottom: 1rem; /* Margen inferior */
-    }
-
-    /* Modo oscuro */
-    .dark-mode { /* Estilos para el modo oscuro */
-      background-color: #121212; /* Color de fondo oscuro */
-      color: #f1f1f1; /* Color del texto blanco */
-    }
-
-    .dark-mode input,
-    .dark-mode textarea,
-    .dark-mode .form-control { /* Estilos para los inputs y textarea en modo oscuro */
-      background-color: #2a2a2a; /* Fondo oscuro */
-      color: white; /* Texto blanco */
-      border: 1px solid #666; /* Borde gris */
-    }
-
-    .dark-mode .btn-primary { /* Estilo para el boton primario en modo oscuro */
-      background-color: #4caf50; /* Fondo verde */
-      border: none; /* Sin borde */
-    }
-
-    .dark-mode .btn-secondary { /* Estilo para el boton secundario en modo oscuro */
-      background-color: #5a5a5a; /* Fondo gris oscuro */
-    }
-
-    .dark-mode .btn-link { /* Estilo para el boton de enlace en modo oscuro */
-      background-color: #333; /* Fondo gris oscuro */
-      color: white; /* Texto blanco */
-    }
-
-    .dark-mode .btn-link:hover { /* Estilo cuando el boton de enlace es hovered en modo oscuro */
-      background-color: #555; /* Fondo gris más claro */
-    }
-  </style>
+  <script src="/theme.js" defer></script> <!-- Enlace al script para manejar el cambio de tema -->
+  <link rel="stylesheet" href="/style.css"> <!-- Enlace a la hoja de estilo personalizada -->
 </head>
 <body>
   <div class="container py-4">
@@ -78,12 +20,20 @@
     </div>
 
     <!-- Formulario para editar la tarea -->
-    <form action="/task/<%= task._id %>/update" method="POST">
-      <input name="name" value="<%= task.name %>" class="form-control" required> <!-- Campo para el nombre de la tarea -->
-      <textarea name="description" class="form-control" placeholder="Descripción adicional"><%= task.description %></textarea> <!-- Campo para la descripcion de la tarea -->
-      <button class="btn btn-primary" type="submit">Guardar cambios</button> <!-- Boton para guardar los cambios -->
-      <a href="/project/<%= project._id %>" class="btn btn-secondary">Cancelar</a> <!-- Enlace para cancelar y volver al proyecto -->
-    </form>
+    <div class="edit-form">
+      <form action="/task/<%= task._id %>/update" method="POST">
+        <input name="name" value="<%= task.name %>" class="form-control" required>
+
+  <textarea name="description" class="form-control" placeholder="Descripción adicional"><%= task.description %></textarea>
+
+  <label for="limitDate">Fecha límite:</label>
+  <input type="date" name="limitDate" class="form-control"
+         value="<%= task.limitDate ? task.limitDate.toISOString().split('T')[0] : '' %>">
+
+  <button class="btn btn-primary mt-2" type="submit">Guardar cambios</button>
+  <a href="/project/<%= project._id %>" class="btn btn-secondary mt-2">Cancelar</a>
+</form>
+
 
   </div>
 

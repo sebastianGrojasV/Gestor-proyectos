@@ -1,8 +1,13 @@
-const mongoose = require('mongoose'); //importa mongoose para interactuar con la base de datos
+const mongoose = require('mongoose');
 
-const ProjectSchema = new mongoose.Schema({ //define el esquema del proyecto
-  name: String, //nombre del proyecto
-  createdAt: { type: Date, default: Date.now } //fecha de creación, por defecto es la fecha actual
+const projectSchema = new mongoose.Schema({
+  name: String,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  }
 });
 
-module.exports = mongoose.model('Project', ProjectSchema); //exporta el modelo de proyecto basado en el esquema
+module.exports = mongoose.model('Project', projectSchema);
+
